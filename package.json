@@ -1,0 +1,58 @@
+{
+  "name": "techno-boto-chat",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=20.0.0",
+    "yarn": ">=1.22.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "ci": "yarn lint && yarn lint:yaml && yarn type-check && yarn test && yarn build",
+    "start": "next start",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore --fix",
+    "lint:yaml": "npx yaml-lint compose.yaml .github/workflows/*.yaml .yamllint.yml",
+    "format": "yarn lint:fix",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "@types/react-syntax-highlighter": "^15.5.13",
+    "next": "^15.5.4",
+    "openai": "^5.23.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-markdown": "^10.1.0",
+    "react-syntax-highlighter": "^15.6.6",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.36.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20",
+    "@types/react": "^19.1.14",
+    "@types/react-dom": "^19.1.9",
+    "@typescript-eslint/eslint-plugin": "^8.44.1",
+    "@typescript-eslint/parser": "^8.44.1",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.5",
+    "eslint-plugin-prettier": "^5.5.4",
+    "jest": "^30.1.3",
+    "jest-environment-jsdom": "^30.1.2",
+    "postcss": "^8.4.40",
+    "prettier": "^3.6.2",
+    "tailwindcss": "^3.4.7",
+    "typescript": "^5",
+    "yaml-lint": "^1.7.0"
+  }
+}

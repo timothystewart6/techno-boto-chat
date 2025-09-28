@@ -1,0 +1,26 @@
+services:
+  techno-boto-chat:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - LLM_API_BASE_URL=http://model-runner.docker.internal/engines/v1
+      - MODEL_NAME=ai/gpt-oss
+      - OPENAI_API_KEY= # Leave empty for local models like Docker Model Runner
+      - NODE_ENV=production
+      - ENABLE_REASONING=true
+      - NEXT_TELEMETRY_DISABLED=1
+    volumes:
+      - techno-boto-chat-data:/app/data
+    depends_on:
+      - docker-model-runner
+    restart: unless-stopped
+
+  docker-model-runner:
+    provider:
+      type: model
+      options:
+        model: ai/gpt-oss # Match the MODEL_NAME above
+
+volumes:
+  techno-boto-chat-data:

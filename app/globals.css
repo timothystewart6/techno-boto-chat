@@ -1,0 +1,198 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Modern 2025 Color Palette - Dark First */
+  --background-primary: 11 11 15; /* Rich dark gray */
+  --background-secondary: 17 17 23; /* Slightly lighter */
+  --background-tertiary: 23 23 31; /* Cards/surfaces */
+  --background-accent: 31 31 41; /* Elevated elements */
+
+  --text-primary: 248 250 252; /* Pure white-ish */
+  --text-secondary: 203 213 225; /* Muted white */
+  --text-tertiary: 148 163 184; /* Subtle gray */
+  --text-quaternary: 100 116 139; /* Very subtle */
+
+  --accent-primary: 147 51 234; /* Modern purple */
+  --accent-secondary: 79 70 229; /* Deep indigo */
+  --accent-success: 34 197 94; /* Clean green */
+  --accent-warning: 251 191 36; /* Warm amber */
+  --accent-error: 239 68 68; /* Vibrant red */
+
+  --border-primary: 39 39 51; /* Subtle borders */
+  --border-secondary: 51 51 68; /* More prominent */
+  --border-accent: 79 70 229; /* Accent borders */
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="light"] {
+  --background-primary: 255 255 255;
+  --background-secondary: 248 250 252;
+  --background-tertiary: 241 245 249;
+  --background-accent: 230 235 241;
+
+  --text-primary: 15 23 42;
+  --text-secondary: 51 65 85;
+  --text-tertiary: 100 116 139;
+  --text-quaternary: 148 163 184;
+
+  --border-primary: 226 232 240;
+  --border-secondary: 203 213 225;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Roboto",
+    "Oxygen",
+    "Ubuntu",
+    "Cantarell",
+    "Open Sans",
+    "Helvetica Neue",
+    sans-serif;
+  background-color: rgb(var(--background-primary));
+  color: rgb(var(--text-primary));
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(var(--background-secondary));
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--border-secondary));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--text-quaternary));
+}
+
+/* Smooth transitions for all interactive elements */
+button,
+input,
+textarea,
+select {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Focus states */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid rgb(var(--accent-primary));
+  outline-offset: 2px;
+}
+
+/* Modern glass morphism effect */
+.glass {
+  background: rgba(var(--background-tertiary), 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(var(--border-primary), 0.5);
+}
+
+.message-bubble {
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+.message-bubble.user {
+  margin-left: auto;
+  background: #3b82f6;
+  color: white;
+}
+
+.message-bubble.bot {
+  margin-right: auto;
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.dark .message-bubble.bot {
+  background: #374151;
+  color: #f9fafb;
+}
+
+/* Custom markdown styles for messages */
+.message-content .prose {
+  color: inherit;
+}
+
+.message-content .prose * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.message-content .prose p + p {
+  margin-top: 0.5rem;
+}
+
+.message-content .prose ul,
+.message-content .prose ol {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.message-content .prose li + li {
+  margin-top: 0.25rem;
+}
+
+.message-content .prose h1,
+.message-content .prose h2,
+.message-content .prose h3 {
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.message-content .prose h1:first-child,
+.message-content .prose h2:first-child,
+.message-content .prose h3:first-child {
+  margin-top: 0;
+}
+
+.message-content .prose pre {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.message-content .prose blockquote {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.message-content .prose table {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}

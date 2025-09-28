@@ -1,0 +1,42 @@
+# yamllint configuration file
+extends: default
+
+rules:
+  # Allow longer lines for Cloud Build files with long environment variable lists
+  line-length:
+    max: 200
+
+  # Stricter truthy values - be more explicit for Cloud Build
+  truthy:
+    allowed-values: ["true", "false", "on", "off", "yes", "no"]
+    check-keys: true
+
+  # Allow empty values in some cases
+  empty-values:
+    forbid-in-block-mappings: false
+    forbid-in-flow-mappings: false
+
+  # Allow comments at the end of lines
+  comments:
+    min-spaces-from-content: 1
+
+  # Disable document start requirement (not needed for Cloud Build)
+  document-start: disable
+
+  # Stricter quoted strings - but allow quotes for Cloud Build compatibility
+  quoted-strings:
+    quote-type: any
+    required: false
+    check-keys: false
+
+  # Enforce consistent indentation
+  indentation:
+    spaces: 2
+    indent-sequences: true
+    check-multi-line-strings: false
+
+ignore: |
+  node_modules/
+  .next/
+  dist/
+  build/
