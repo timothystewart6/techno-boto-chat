@@ -56,7 +56,7 @@ export default function ChatBot() {
     <div className="flex flex-col h-screen bg-bg-primary">
       <Header
         title="techno-boto-chat"
-        subtitle="A Mediocore AI Chat Interface"
+        subtitle="A Mediocre AI Chat Interface"
         modelInfo={modelInfo || undefined}
       />
 

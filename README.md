@@ -2,7 +2,7 @@
 
 <div align="center">
 
-_A Mediocore AI Chat Interface_
+_A Mediocre AI Chat Interface_
 
 [![Next.js 15](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://typescriptlang.org/)
