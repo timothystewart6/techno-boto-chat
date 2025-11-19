@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useState, useEffect, useRef } from 'react';
 import { Message } from '@/app/types';
 import MessageBubble from './message-bubble';
 import LoadingIndicator from './loading-indicator';
@@ -12,9 +12,36 @@ interface MessageListProps {
 const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
   ({ messages, isLoading }, ref) => {
     const { theme } = useTheme();
+    const [showScrollButton, setShowScrollButton] = useState(false);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      const scrollContainer = scrollContainerRef.current;
+      if (!scrollContainer) return;
+
+      const handleScroll = () => {
+        const { scrollHeight, scrollTop, clientHeight } = scrollContainer;
+        const isAtBottom = scrollHeight - scrollTop - clientHeight < 100;
+        setShowScrollButton(!isAtBottom);
+      };
+
+      scrollContainer.addEventListener('scroll', handleScroll);
+
+      handleScroll();
+
+      return () => {
+        scrollContainer.removeEventListener('scroll', handleScroll);
+      };
+    }, []);
+
+    const scrollToBottom = () => {
+      if (typeof ref !== 'function' && ref?.current) {
+        ref.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }
+    };
 
     return (
-      <div className="flex-1 overflow-y-auto">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto relative">
         <div className="flex flex-col space-y-4 p-4 lg:p-6">
           {messages.length === 0 ? (
             <div className="flex flex-1 items-center justify-center">
@@ -58,6 +85,29 @@ const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
           {/* Scroll anchor */}
           <div ref={ref} className="h-1" />
         </div>
+
+        {/* Scroll to bottom button */}
+        {showScrollButton && (
+          <button
+            onClick={scrollToBottom}
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center h-10 w-10 rounded-full bg-accent-primary hover:bg-accent-primary/90 shadow-lg transition-colors focus:outline-none focus:ring-2 focus:ring-accent-primary/50"
+            aria-label="Scroll to bottom"
+          >
+            <svg
+              className="h-5 w-5 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 14l-7 7m0 0l-7-7m7 7V3"
+              />
+            </svg>
+          </button>
+        )}
       </div>
     );
   },
