@@ -97,6 +97,88 @@ export class TechnoBotoChatClient {
     return content.trim();
   }
 
+  async generateChatResponseStreaming(
+    userMessage: string,
+    systemPrompt: string = process.env.NEXT_PUBLIC_SYSTEM_PROMPT_REGULAR ||
+      'You are a helpful AI assistant. Provide concise, friendly responses.',
+    options: ChatOptions = {},
+    onChunk?: (chunk: string) => void,
+  ): Promise<string> {
+    const {
+      maxTokens = parseInt(
+        process.env.NEXT_PUBLIC_MAX_TOKENS_REGULAR || '1000',
+      ),
+      temperature = 0.7,
+    } = options;
+
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt,
+          },
+          {
+            role: 'user',
+            content: userMessage,
+          },
+        ],
+        max_tokens: maxTokens,
+        temperature,
+        stream: true,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response
+        .json()
+        .catch(() => ({ error: 'Unknown error' }));
+      throw new Error(
+        errorData.error || `HTTP ${response.status}: ${response.statusText}`,
+      );
+    }
+
+    const reader = response.body?.getReader();
+    if (!reader) {
+      throw new Error('No response body');
+    }
+
+    const decoder = new TextDecoder();
+    let fullContent = '';
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n').filter((line) => line.trim());
+
+        for (const line of lines) {
+          try {
+            const parsed = JSON.parse(line);
+            if (parsed.content) {
+              fullContent += parsed.content;
+              if (onChunk) {
+                onChunk(parsed.content);
+              }
+            }
+          } catch {
+            // Skip invalid JSON lines
+          }
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+
+    return fullContent.trim();
+  }
+
   async generateChatResponseWithReasoning(
     userMessage: string,
     systemPrompt: string = process.env.NEXT_PUBLIC_SYSTEM_PROMPT_REASONING ||

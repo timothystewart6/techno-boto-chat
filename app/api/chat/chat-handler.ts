@@ -5,6 +5,7 @@ export interface ChatRequestBody {
   messages: any[];
   max_tokens?: number;
   temperature?: number;
+  stream?: boolean;
 }
 
 export interface ChatResponse {
@@ -36,6 +37,86 @@ export async function handleChatCompletion(
     return { data: completion };
   } catch (error) {
     console.error('API route error:', error);
+
+    // Handle different types of errors
+    if (error instanceof OpenAI.APIError) {
+      return {
+        error: `API request failed: ${error.message}`,
+        status: error.status || 500,
+      };
+    }
+
+    // Handle server client configuration errors
+    if (
+      error instanceof Error &&
+      (error.message.includes('Missing LLM_API_BASE_URL') ||
+        error.message.includes('Missing model name'))
+    ) {
+      return {
+        error: `Server configuration error: ${error.message}`,
+        status: 500,
+      };
+    }
+
+    // Handle fetch/connection errors
+    if (error instanceof Error && error.message.includes('fetch')) {
+      return {
+        error:
+          'Cannot connect to AI model. Please check your Docker Model Runner configuration.',
+        status: 503,
+      };
+    }
+
+    // Handle other errors
+    return {
+      error: 'Internal server error',
+      status: 500,
+    };
+  }
+}
+
+// Streaming handler - returns a stream
+export async function handleChatCompletionStream(
+  body: ChatRequestBody,
+): Promise<ReadableStream | ChatResponse> {
+  try {
+    // Create server LLM client
+    const client = new LLMClient();
+
+    console.log('API Configuration (streaming):', client.getConfig());
+
+    // Use the server client to generate streaming response
+    const stream = await client.getOpenAIClient().chat.completions.create({
+      model: client.getConfig().modelName,
+      messages: body.messages,
+      max_tokens: body.max_tokens || 150,
+      temperature: body.temperature || 0.7,
+      stream: true,
+    });
+
+    // Create a readable stream that transforms the OpenAI stream
+    const encoder = new TextEncoder();
+    const readableStream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of stream) {
+            const content = chunk.choices[0]?.delta?.content;
+            if (content) {
+              const data = JSON.stringify({ content }) + '\n';
+              controller.enqueue(encoder.encode(data));
+            }
+          }
+          controller.close();
+        } catch (error) {
+          console.error('Streaming error:', error);
+          controller.error(error);
+        }
+      },
+    });
+
+    return readableStream;
+  } catch (error) {
+    console.error('API route streaming error:', error);
 
     // Handle different types of errors
     if (error instanceof OpenAI.APIError) {
