@@ -76,41 +76,63 @@ export function useChat({ onError }: UseChatOptions) {
     setInputValue('');
     setIsLoading(true);
 
+    // Create a placeholder bot message for streaming
+    const botMessageId = Date.now() + 1;
+    const botMessage: Message = {
+      id: botMessageId,
+      text: '',
+      sender: 'bot',
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, botMessage]);
+
     try {
       // Use cached reasoning configuration (no API call needed)
       if (process.env.NODE_ENV === 'development') {
         console.log('Using cached reasoning config:', { enableReasoning });
       }
 
-      let botMessage: Message;
-
       if (enableReasoning) {
         const botResponse = await client.generateChatResponseWithReasoning(
           userMessage.text,
         );
-        botMessage = {
-          id: Date.now() + 1,
-          text: botResponse.content,
-          sender: 'bot',
-          timestamp: new Date(),
-          reasoning: botResponse.reasoning,
-          isReasoningVisible: false, // Hide reasoning by default
-        };
-      } else {
-        const botResponseText = await client.generateChatResponse(
-          userMessage.text,
+        // Update the bot message with the final response
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === botMessageId
+              ? {
+                  ...msg,
+                  text: botResponse.content,
+                  reasoning: botResponse.reasoning,
+                  isReasoningVisible: false,
+                }
+              : msg,
+          ),
         );
-        botMessage = {
-          id: Date.now() + 1,
-          text: botResponseText,
-          sender: 'bot',
-          timestamp: new Date(),
-        };
+      } else {
+        // Use streaming for regular responses
+        await client.generateChatResponseStreaming(
+          userMessage.text,
+          undefined,
+          {},
+          (chunk) => {
+            // Update the bot message with each chunk
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === botMessageId
+                  ? { ...msg, text: msg.text + chunk }
+                  : msg,
+              ),
+            );
+          },
+        );
       }
-
-      setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       console.error('Error getting bot response:', error);
+
+      // Remove the placeholder message on error
+      setMessages((prev) => prev.filter((msg) => msg.id !== botMessageId));
 
       const errorMessage = parseErrorMessage(error);
       onError(errorMessage);
