@@ -1,5 +1,5 @@
 # Use Node.js 24 Alpine image (latest LTS) for smaller size and better performance
-FROM node:24-alpine AS base
+FROM node:24.22.1-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
